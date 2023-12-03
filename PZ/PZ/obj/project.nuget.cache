@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OitHWAQhiZiYax9eNFZFu785c7tONx9A6stJV8ilvlOkqlWlCiP+NrHUIqJXmx9OHtXSh5xf1CyXYk9py04TjA==",
+  "dgSpecHash": "nTViBzhcGwvp2HWwPlIGiS2OPIli2jfkhAqLEntVF4cp+f4Qa7RR2nJ54co9PdrOcKKqRvez2bOQH4CsSuoPeA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\dsdim\\Рабочий стол\\ХНУРЭ\\2 курс\\1 семестр\\Патерни\\PZ\\PZ\\PZ.csproj",
+  "projectFilePath": "C:\\Users\\dsdim\\Source\\Repos\\patterns\\PZ\\PZ\\PZ.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dsdim\\.nuget\\packages\\bouncycastle.cryptography\\2.2.1\\bouncycastle.cryptography.2.2.1.nupkg.sha512",
     "C:\\Users\\dsdim\\.nuget\\packages\\google.protobuf\\3.21.9\\google.protobuf.3.21.9.nupkg.sha512",

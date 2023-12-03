@@ -1,4 +1,5 @@
 ﻿using PZ;
+using System;
 using System.Text;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -19,7 +20,15 @@ string productCategory;
 decimal productPrice;
 int productAvailable;
 
+IObserver observer = new Observer();
+
 DAOFactory factory = new DAOFactory();
+var categoryDAO = factory.CreateDAO<Category>();
+var supplierDAO = factory.CreateDAO<Supplier>();
+var productDAO = factory.CreateDAO<Product>();
+categoryDAO.registerObserver(observer);
+supplierDAO.registerObserver(observer);
+productDAO.registerObserver(observer);
 
 do
 {
@@ -44,13 +53,14 @@ do
         "\n------------------------------------------");
     Console.Write("\nВиберіть опцію (1 або 15): ");
 
+    
     if (int.TryParse(Console.ReadLine(), out choice))
     {
         switch (choice)
         {
             case 1:
-                categories = factory.CreateDAO<Category>().GetAll();
-                Console.WriteLine("Список категорій:");
+                categories = categoryDAO.GetAll();
+                Console.WriteLine("\nСписок категорій:");
                 foreach (Category category in categories)
                 {
                     categoryID = category.GetId();
@@ -63,7 +73,7 @@ do
             case 2:
                 Console.Write("\nВведіть назву категорії для пошуку: ");
                 string searchCategory = Console.ReadLine();
-                categories = factory.CreateDAO<Category>().GetByName(searchCategory);
+                categories = categoryDAO.GetByName(searchCategory);
                 if (categories.Count > 0)
                 {
                     Console.WriteLine("\nЗнайдені категорії:");
@@ -87,7 +97,7 @@ do
                 Category newCategory = new Category.CategoryBuilder()
                     .SetName(categoryName)
                     .Build();
-                factory.CreateDAO<Category>().Add(newCategory);
+                categoryDAO.Add(newCategory);
             break;
 
             case 4:
@@ -98,18 +108,18 @@ do
                 Category UpdateCategory = new Category.CategoryBuilder()
                     .SetName(categoryName)
                     .Build();
-                factory.CreateDAO<Category>().Update(categoryID, UpdateCategory);
-            break;
+                categoryDAO.Update(categoryID, UpdateCategory);
+                break;
 
             case 5:
                 Console.Write("\nВведіть ID категорії: ");
                 categoryID = Convert.ToInt32( Console.ReadLine());
-                factory.CreateDAO<Category>().Delete(categoryID);
+                categoryDAO.Delete(categoryID);
             break;
 
             case 6:
-                suppliers = factory.CreateDAO<Supplier>().GetAll();
-                Console.WriteLine("Список постачальників:");
+                suppliers = supplierDAO.GetAll();
+                Console.WriteLine("\nСписок постачальників:");
                 foreach (Supplier supplier in suppliers)
                 {
                     supplierID = supplier.GetId();
@@ -123,7 +133,7 @@ do
             case 7:
                 Console.Write("\nВведіть назву постачальника для пошуку: ");
                 string searchSupplier = Console.ReadLine();
-                suppliers = factory.CreateDAO<Supplier>().GetByName(searchSupplier);
+                suppliers = supplierDAO.GetByName(searchSupplier);
                 if (suppliers.Count > 0)
                 {
                     Console.WriteLine("\nЗнайдені постачальники:");
@@ -151,7 +161,7 @@ do
                     .SetName(supplierName)
                     .SetCountry(supplierCountry)
                     .Build();
-                factory.CreateDAO<Supplier>().Add(newSupplier);
+                supplierDAO.Add(newSupplier);
             break;
 
             case 9:
@@ -165,18 +175,18 @@ do
                     .SetName(supplierName)
                     .SetCountry(supplierCountry)
                     .Build();
-                factory.CreateDAO<Supplier>().Update(supplierID, UpdateSupplier);
+                supplierDAO.Update(supplierID, UpdateSupplier);
             break;
 
             case 10:
                 Console.Write("\nВведіть ID постачальника: ");
                 supplierID = Convert.ToInt32(Console.ReadLine());
-                factory.CreateDAO<Supplier>().Delete(supplierID);
+                supplierDAO.Delete(supplierID);
             break;
 
             case 11:
-                products = factory.CreateDAO<Product>().GetAll();
-                Console.WriteLine("Список товарів:");
+                products = productDAO.GetAll();
+                Console.WriteLine("\nСписок товарів:");
                 foreach (Product product in products)
                 {
                     productID = product.GetId();
@@ -193,7 +203,7 @@ do
             case 12:
                 Console.Write("\nВведіть назву товару для пошуку: ");
                 string searchProduct = Console.ReadLine();
-                products = factory.CreateDAO<Product>().GetByName(searchProduct);
+                products = productDAO.GetByName(searchProduct);
                 if (products.Count > 0)
                 {
                     Console.WriteLine("\nЗнайдений товар:");
@@ -233,8 +243,7 @@ do
                     .SetPrice(productPrice)
                     .SetAvailable(productAvailable)
                     .Build();
-
-                factory.CreateDAO<Product>().Add(newProduct);
+                productDAO.Add(newProduct);
                 break;
 
             case 14:
@@ -254,18 +263,18 @@ do
                     .SetPrice(productPrice)
                     .SetAvailable(productAvailable)
                     .Build();
-                factory.CreateDAO<Product>().Update(productID, UpdateProduct);
+                productDAO.Update(productID, UpdateProduct);
             break;
 
             case 15:
                 Console.Write("\nВведіть ID товару: ");
                 productID = Convert.ToInt32(Console.ReadLine());
-                factory.CreateDAO<Product>().Delete(productID);
+                productDAO.Delete(productID);
             break;
 
             default:
                 Console.WriteLine("Невірний вибір опції.");
-                break;
+            break;
 
         }
     }

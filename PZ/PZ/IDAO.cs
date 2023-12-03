@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PZ
 {
-    public interface IDAO<T>
+    public interface IDAO<T> : IObservable
     {
         List<T> GetAll();
         List<T> GetByName(string name);

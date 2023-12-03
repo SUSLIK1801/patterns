@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dsdim\\Рабочий стол\\ХНУРЭ\\2 курс\\1 семестр\\Патерни\\PZ\\PZ\\PZ.csproj": {}
+    "C:\\Users\\dsdim\\Source\\Repos\\patterns\\PZ\\PZ\\PZ.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dsdim\\Рабочий стол\\ХНУРЭ\\2 курс\\1 семестр\\Патерни\\PZ\\PZ\\PZ.csproj": {
+    "C:\\Users\\dsdim\\Source\\Repos\\patterns\\PZ\\PZ\\PZ.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dsdim\\Рабочий стол\\ХНУРЭ\\2 курс\\1 семестр\\Патерни\\PZ\\PZ\\PZ.csproj",
+        "projectUniqueName": "C:\\Users\\dsdim\\Source\\Repos\\patterns\\PZ\\PZ\\PZ.csproj",
         "projectName": "PZ",
-        "projectPath": "C:\\Users\\dsdim\\Рабочий стол\\ХНУРЭ\\2 курс\\1 семестр\\Патерни\\PZ\\PZ\\PZ.csproj",
+        "projectPath": "C:\\Users\\dsdim\\Source\\Repos\\patterns\\PZ\\PZ\\PZ.csproj",
         "packagesPath": "C:\\Users\\dsdim\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dsdim\\Рабочий стол\\ХНУРЭ\\2 курс\\1 семестр\\Патерни\\PZ\\PZ\\obj\\",
+        "outputPath": "C:\\Users\\dsdim\\Source\\Repos\\patterns\\PZ\\PZ\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

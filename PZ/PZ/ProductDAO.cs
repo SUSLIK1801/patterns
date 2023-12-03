@@ -10,13 +10,15 @@ using System.Xml.Linq;
 
 namespace PZ
 {
-    public class ProductDAO : IDAO<Product>
+    public class ProductDAO : IDAO<Product>, IObservable
     {
         private MySqlConnection connection;
+        private List<IObserver> observers;
 
         public ProductDAO()
         {
             connection = DbConnection.GetInstance().GetConnection();
+            observers = new List<IObserver>();
         }
 
         public List<Product> GetAll()
@@ -45,6 +47,7 @@ namespace PZ
 
             reader.Close();
             connection.Close();
+            notifyObserver($"ProductObserver: Виведено увесь товар!");
             return products; 
         }
         
@@ -75,6 +78,7 @@ namespace PZ
 
             reader.Close();
             connection.Close();
+            notifyObserver($"ProductObserver: Було знайдено товар(и) з назвою: {name}!");
             return products;
         }
 
@@ -91,11 +95,12 @@ namespace PZ
             int rowsAffected = command.ExecuteNonQuery();
             if (rowsAffected > 0)
             {
-                Console.WriteLine("Товар успішно додано до бази даних.");
+                notifyObserver($"ProductObserver: Було додано новий товар з назвою: {product.GetName()}, постачальником: {product.GetProductSupplier()}, категорією: {product.GetProductCategory()}, ціною: {product.GetPrice()} та кількістю: {product.GetAvailable()}.");
             }
             else
             {
                 Console.WriteLine("Помилка при додаванні товару.");
+                notifyObserver($"ProductObserver: Помилка при додаванні нового товару з назвою: {product.GetName()}, постачальником: {product.GetProductSupplier()}, категорією: {product.GetProductCategory()}, ціною: {product.GetPrice()} та кількістю: {product.GetAvailable()}.");
             }
             connection.Close();
         }
@@ -113,11 +118,12 @@ namespace PZ
             int rowsAffected = command.ExecuteNonQuery();
             if (rowsAffected > 0)
             {
-                Console.WriteLine("Дані товару успішно оновлено.");
+                notifyObserver($"ProductObserver: Товар з ID: {ID} оновлено!");
             }
             else
             {
                 Console.WriteLine("Помилка при оновленні даних товару.");
+                notifyObserver($"ProductObserver: Помилка при оновлені товару з ID: {ID}");
             }
             connection.Close();
         }
@@ -132,13 +138,34 @@ namespace PZ
 
             if (rowsAffected > 0)
             {
-                Console.WriteLine("Товар успішно видалено.");
+                notifyObserver($"ProductObserver: Товар з ID: {ID} видалено!");
             }
             else
             {
                 Console.WriteLine("Помилка при видаленні товару. Можливо, запис із зазначеним ID не існує.");
+                notifyObserver($"ProductObserver: Помилка при видаленні товару з ID: {ID}.");
             }
             connection.Close();
+        }
+
+        public void registerObserver(IObserver observer)
+        {
+            observers.Add(observer);
+            Console.WriteLine("Слухача ProductObserver зареєстровано!");
+        }
+
+        public void unregisterObserver(IObserver observer)
+        {
+            observers.Remove(observer);
+            Console.WriteLine("Слухача ProductObserver видалено!");
+        }
+
+        public void notifyObserver(string message)
+        {
+            foreach (IObserver observer in observers)
+            {
+                observer.Update(message);
+            }
         }
     }
 }

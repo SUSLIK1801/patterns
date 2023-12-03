@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 
 namespace PZ
 {
-    public class SupplierDAO : IDAO<Supplier>
+    public class SupplierDAO : IDAO<Supplier>, IObservable
     {
         private MySqlConnection connection;
+        private List<IObserver> observers;
 
         public SupplierDAO()
         {
             connection = DbConnection.GetInstance().GetConnection();
+            observers = new List<IObserver>();
         }
 
         public List<Supplier> GetAll()
@@ -29,13 +31,12 @@ namespace PZ
                     .SetId(reader.GetInt32(0))
                     .SetName(reader.GetString(1))
                     .SetCountry(reader.IsDBNull(2) ? "Невідома" : reader.GetString(2));
-
                 Supplier supplier = builder.Build();
                 suppliers.Add(supplier);
             }
-
             reader.Close();
             connection.Close();
+            notifyObserver($"SupplierObserver: Виведено усіх постачальників товарів!");
             return suppliers;
         }
 
@@ -53,13 +54,12 @@ namespace PZ
                     .SetId(reader.GetInt32(0))
                     .SetName(reader.GetString(1))
                     .SetCountry(reader.IsDBNull(2) ? "Невідома" : reader.GetString(2));
-
                 Supplier supplier = builder.Build();
                 suppliers.Add(supplier);
             }
-
             reader.Close();
             connection.Close();
+            notifyObserver($"SupplierObserver: Було знайдено постачальника(ів) товарів з назвою: {name}!");
             return suppliers;
         }
 
@@ -73,11 +73,12 @@ namespace PZ
             int rowsAffected = command.ExecuteNonQuery();
             if (rowsAffected > 0)
             {
-                Console.WriteLine("Постачальника успішно додано до бази даних.");
+                notifyObserver($"SupplierObserver: Було додано нового постачальника з назвою: {supplier.GetName()} та країною: {supplier.GetCountry()}");
             }
             else
             {
                 Console.WriteLine("Помилка при додаванні постачальника.");
+                notifyObserver($"SupplierObserver: Помилка при додаванні нового постачальника з назвою: {supplier.GetName()} та країною: {supplier.GetCountry()}");
             }
             connection.Close();
         }
@@ -94,11 +95,12 @@ namespace PZ
 
             if(rowsAffected > 0)
             {
-                Console.WriteLine("Дані постачальника успішно оновлено.");
+                notifyObserver($"SupplierObserver: Постачальника з ID: {ID} оновлено!");
             }
             else
             {
                 Console.WriteLine("Помилка при оновленні даних постачальника.");
+                notifyObserver($"SupplierObserver: Помилка при оновлені постачальника з ID: {ID}");
             }
             connection.Close();
         }
@@ -113,13 +115,34 @@ namespace PZ
 
             if (rowsAffected > 0)
             {
-                Console.WriteLine("Постачальника успішно видалено.");
+                notifyObserver($"SupplierObserver: Постачальника з ID: {ID} видалено!");
             }
             else
             {
                 Console.WriteLine("Помилка при видаленні постачальника. Можливо, запис із зазначеним ID не існує.");
+                notifyObserver($"SupplierObserver: Помилка при видаленні постачальника з ID: {ID}.");
             }
             connection.Close();
+        }
+
+        public void registerObserver(IObserver observer)
+        {
+            observers.Add(observer);
+            Console.WriteLine("Слухача SupplierObserver зареєстровано!");
+        }
+
+        public void unregisterObserver(IObserver observer)
+        {
+            observers.Remove(observer);
+            Console.WriteLine("Слухача SupplierObserver видалено!");
+        }
+
+        public void notifyObserver(string message)
+        {
+            foreach (IObserver observer in observers)
+            {
+                observer.Update(message);
+            }
         }
     }
 }

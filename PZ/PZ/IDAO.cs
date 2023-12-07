@@ -13,5 +13,6 @@ namespace PZ
         void Add(T obj);
         void Update(int ID, T obj);
         void Delete(int ID);
+        void Pop();
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -14,11 +15,13 @@ namespace PZ
     {
         private MySqlConnection connection;
         private List<IObserver> observers;
+        private ProductCaretaker caretaker;
 
         public ProductDAO()
         {
             connection = DbConnection.GetInstance().GetConnection();
             observers = new List<IObserver>();
+            caretaker = new ProductCaretaker();
         }
 
         public List<Product> GetAll()
@@ -40,11 +43,9 @@ namespace PZ
                 .SetCategory(reader.IsDBNull(3) ? "Невідомий" : reader.GetString(3))
                 .SetPrice(reader.GetDecimal(4))
                 .SetAvailable(reader.GetInt32(5));
-
                 Product product = builder.Build();
                 products.Add(product);
             }
-
             reader.Close();
             connection.Close();
             notifyObserver($"ProductObserver: Виведено увесь товар!");
@@ -71,11 +72,9 @@ namespace PZ
                 .SetCategory(reader.IsDBNull(3) ? "Невідомий" : reader.GetString(3))
                 .SetPrice(reader.GetDecimal(4))
                 .SetAvailable(reader.GetInt32(5));
-
                 Product product = builder.Build();
                 products.Add(product);
             }
-
             reader.Close();
             connection.Close();
             notifyObserver($"ProductObserver: Було знайдено товар(и) з назвою: {name}!");
@@ -108,6 +107,8 @@ namespace PZ
         public void Update(int ID, Product product)
         {
             connection.Open();
+            Product productBefore = searchByID(ID);
+            caretaker.Push(productBefore.SaveState());
             string updateProduct = "UPDATE confectionery_store.products SET supplier_id = (select supplier.supplier_id from supplier where supplier.name = @SUPNAME), category_id = (select category.category_id from category where category.name = @CATNAME), price = @PRICE, availablity = @AVAILABLE WHERE (product_id = @ID)";
             MySqlCommand command = new MySqlCommand(updateProduct, connection);
             command.Parameters.Add("@ID", MySqlDbType.Int32).Value = ID;
@@ -126,6 +127,48 @@ namespace PZ
                 notifyObserver($"ProductObserver: Помилка при оновлені товару з ID: {ID}");
             }
             connection.Close();
+        }
+
+        private Product searchByID(int id)
+        {
+            string ProductByID = "SELECT products.product_id, products.name, supplier.name, category.name, products.price, products.availablity FROM products " +
+                "left join supplier ON products.supplier_id = supplier.supplier_id " +
+                "left join category ON products.category_id = category.category_id " +
+                "WHERE products.product_id = @ID";
+            MySqlCommand command = new MySqlCommand(ProductByID, connection);
+            command.Parameters.Add("@ID", MySqlDbType.Int32).Value = id;
+            MySqlDataReader reader = command.ExecuteReader();
+            Product product = new Product();
+            while (reader.Read())
+            {
+                product = new Product.ProductBuilder()
+                .SetId(reader.GetInt32(0))
+                .SetName(reader.GetString(1))
+                .SetSupplier(reader.IsDBNull(2) ? "Невідомий" : reader.GetString(2))
+                .SetCategory(reader.IsDBNull(3) ? "Невідомий" : reader.GetString(3))
+                .SetPrice(reader.GetDecimal(4))
+                .SetAvailable(reader.GetInt32(5))
+                .Build();
+            }
+            reader.Close();
+            return product;
+        }
+
+        public void Pop()
+        {
+            if(caretaker.mementos.Count() >= 1)
+            {
+                ProductMemento productMemento = caretaker.Pop();
+                Product lastProductState = new Product();
+                lastProductState.RestoreState(productMemento);
+                Update(productMemento.Id, lastProductState);
+                
+                Console.WriteLine("ProductObserver: Остання зміна скасована.");
+            }
+            else
+            {
+                Console.WriteLine("Немає змін для скасування.");
+            }
         }
 
         public void Delete(int ID)

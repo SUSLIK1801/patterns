@@ -83,5 +83,21 @@ namespace PZ
                 return product;
             }
         }
+
+        public ProductMemento SaveState()
+        {
+            Console.WriteLine($"Зберігання товару (ID: {Id}, Назва: {Name}, Постачальник: {ProductSupplier}, Категорія: {ProductCategory}, Ціна: {Price}, Кількість: {Available}.)");
+            return new ProductMemento(Id, Name, ProductSupplier, ProductCategory, Price, Available);
+        }
+
+        public void RestoreState(ProductMemento memento)
+        {
+            Id = memento.Id;
+            Name = memento.Name;
+            ProductSupplier = memento.ProductSupplier;
+            ProductCategory = memento.ProductCategory;
+            Price = memento.Price;
+            Available = memento.Available;
+        }
     }
 }

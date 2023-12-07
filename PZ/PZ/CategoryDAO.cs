@@ -139,5 +139,10 @@ namespace PZ
                 observer.Update(message);
             }
         }
+
+        public void Pop()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

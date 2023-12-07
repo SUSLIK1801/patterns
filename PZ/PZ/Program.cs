@@ -50,8 +50,9 @@ do
         "\n13 - Додати новий товар" +
         "\n14 - Оновити дані про товар" +
         "\n15 - Видалити товар" +
+        "\n16 - Скасувати останню зміну" +
         "\n------------------------------------------");
-    Console.Write("\nВиберіть опцію (1 або 15): ");
+    Console.Write("\nВиберіть опцію (1 або 16): ");
 
     
     if (int.TryParse(Console.ReadLine(), out choice))
@@ -270,6 +271,10 @@ do
                 Console.Write("\nВведіть ID товару: ");
                 productID = Convert.ToInt32(Console.ReadLine());
                 productDAO.Delete(productID);
+            break;
+
+            case 16:
+                productDAO.Pop();    
             break;
 
             default:

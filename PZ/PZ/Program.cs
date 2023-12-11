@@ -1,5 +1,6 @@
 ﻿using PZ;
 using System;
+using System.Data;
 using System.Text;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -25,7 +26,21 @@ IObserver observer = new Observer();
 DAOFactory factory = new DAOFactory();
 var categoryDAO = factory.CreateDAO<Category>();
 var supplierDAO = factory.CreateDAO<Supplier>();
-var productDAO = factory.CreateDAO<Product>();
+//UserRole role = UserRole.user;
+UserRole role;
+Console.WriteLine("Оберіть роль (admin/user): ");
+string roleInput = Console.ReadLine();
+
+if (Enum.TryParse(roleInput, true, out role) && Enum.IsDefined(typeof(UserRole), role))
+{
+    Console.WriteLine($"Вхід у систему з ролю: {role}");
+}
+else
+{
+    Console.WriteLine("Невірна роль. За замовчуванням обрано роль: 'user'.");
+    role = UserRole.user;
+}
+var productDAO = new ProxyUserDAO(role);
 categoryDAO.registerObserver(observer);
 supplierDAO.registerObserver(observer);
 productDAO.registerObserver(observer);
